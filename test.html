@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentino Ivanovski</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <img src="pfp.jpg" alt="Profile Picture" class="profile-pic" id="profilePic">
+        <div id="overlay"></div>
+        <div class="header-text">
+            <h1>Valentino Ivanovski</h1>
+            <p id="email"><a href="mailto:valentino.ivanovski@icloud.com">valentino.ivanovski@icloud.com</a></p>
+            <h2>3D Interior Designer in Blender <img src="blender.png" alt="Blender Logo" style="width: 17px; height: 15px; position:absolute; left: 200px;"></h2>
+        </div>
+    </header>
+
+    <!-- Slideshow Background -->
+    <div class="slideshow-container">
+        <div class="slides fade"><img src="1.png" alt="Image 1"></div>
+        <div class="slides fade"><img src="2.png" alt="Image 2"></div>
+        <div class="slides fade"><img src="3.png" alt="Image 3"></div>
+        <div class="slides fade"><img src="4.png" alt="Image 4"></div>
+        <div class="slides fade"><img src="5.png" alt="Image 5"></div>
+        <div class="slides fade"><img src="6.png" alt="Image 6"></div>
+        <div class="slides fade"><img src="7.png" alt="Image 7"></div>
+        <div class="slides fade"><img src="8.png" alt="Image 8"></div>
+        <div class="slides fade"><img src="9.png" alt="Image 9"></div>
+        <div class="slides fade"><img src="10.png" alt="Image 10"></div>
+        <div class="slides fade"><img src="11.png" alt="Image 11"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Georgia", serif;
+        overflow: hidden;
+        background: black;
+    }
+
+    /* Header styles */
+    .header {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        z-index: 10;
+    }
+
+    /* Profile Picture */
+    .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    /* Header text */
+    .header-text h1 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        cursor: default;
+    }
+
+    .header-text p {
+        font-size: 14px;
+        color: #555;
+    }
+
+    .header-text h2 {
+        position:relative;
+        font-size: 14px;
+        color: #777;
+        font-weight: normal;
+        cursor: default;
+    }
+
+    /* Slideshow */
+    .slideshow-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+    }
+
+    .slides {
+        width: 100%;
+        height: 100vh;
+        position: absolute;
+        opacity: 0;
+        transition: opacity 3s ease-in-out;
+    }
+
+    .slides img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+/* Profile Picture */
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+/* Overlay */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    z-index: 99;
+}
+
+/* Expanded Profile Picture */
+#overlay img {
+    width: 200px; /* Adjust size */
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    transform: scale(0.5);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+/* Show Overlay */
+#overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#overlay.show img {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Email - Remove default link styling */
+#email a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+</style>
+<script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".slides");
+
+    function showSlides() {
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.opacity = "0";
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {
+            slideIndex = 1;
+        }
+        slides[slideIndex - 1].style.opacity = "1";
+        setTimeout(showSlides, 5000); // Change image every 4 seconds
+    }
+
+    showSlides();
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const profilePic = document.getElementById("profilePic");
+    const overlay = document.getElementById("overlay");
+
+    // Expand profile picture with animation
+    profilePic.addEventListener("click", function () {
+        overlay.innerHTML = ""; // Clear previous content
+        const enlargedPic = document.createElement("img");
+        enlargedPic.src = profilePic.src;
+        overlay.appendChild(enlargedPic);
+        overlay.classList.add("show"); // Add animation class
+    });
+
+    // Close overlay with animation
+    overlay.addEventListener("click", function (event) {
+        if (event.target === overlay) {
+            overlay.classList.remove("show"); // Remove animation class
+        }
+    });
+});
+</script>
+</html>
