@@ -6,6 +6,9 @@
     <title>Valentino Ivanovski</title>
 </head>
 <body>
+    <div id="loading-overlay">
+        <div class="loader"></div>
+    </div>
     <!-- Header -->
     <header class="header">
         <img src="pfp.jpg" alt="Profile Picture" class="profile-pic" id="profilePic">
@@ -167,6 +170,46 @@
     color: inherit;
     cursor: pointer;
 }
+
+/* Full-screen loading overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeOut 1s forwards 1s;
+}
+
+/* Loader animation (optional) */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgb(106, 106, 106);
+    border-top: 5px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Fade out animation */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+/* Spinning effect */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 </style>
 <script>
     let slideIndex = 0;
@@ -205,6 +248,10 @@
             overlay.classList.remove("show"); // Remove animation class
         }
     });
+});
+
+window.addEventListener("load", () => {
+    document.getElementById("loading-overlay").style.display = "none";
 });
 </script>
 </html>
