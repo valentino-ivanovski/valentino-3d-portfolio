@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://render.madebytino.com/sitemap.xml
