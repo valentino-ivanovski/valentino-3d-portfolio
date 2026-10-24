@@ -7,6 +7,7 @@ let paused = reducedMotion.matches;
 let timer;
 let ready = false;
 let navigating = false;
+const pendingMoves = [];
 
 // Decode before a frame can become visible; keep the current frame on failure.
 const frames = slides.map(async (slide) => {
@@ -19,9 +20,27 @@ const frames = slides.map(async (slide) => {
 });
 
 function updatePlayback() {
-    playback.setAttribute('aria-pressed', String(paused));
-    playback.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow');
-    playback.textContent = paused ? 'Play' : 'Pause';
+    const state = String(paused);
+    if (playback.dataset.paused === state) return;
+    const animateChange = playback.dataset.paused !== undefined && !reducedMotion.matches;
+    const oldWidth = playback.getBoundingClientRect().width;
+    const labelWindow = playback.querySelector('.button-label');
+    playback.getAnimations().forEach(animation => animation.cancel());
+    labelWindow.getAnimations().forEach(animation => animation.cancel());
+    playback.dataset.paused = state;
+    playback.setAttribute('aria-pressed', state);
+    playback.setAttribute('aria-label', paused ? 'Unpause slideshow' : 'Pause slideshow');
+    playback.querySelectorAll('.button-stack span').forEach(label => {
+        label.textContent = paused ? 'Unpause' : 'Pause';
+    });
+    if (animateChange) {
+        const newWidth = playback.getBoundingClientRect().width;
+        const timing = { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' };
+        playback.animate([
+            { width: `${oldWidth}px` },
+            { width: `${newWidth}px` }
+        ], timing);
+    }
 }
 
 function schedule() {
@@ -34,7 +53,16 @@ function advance() {
 }
 
 async function moveSlide(direction, manual = false) {
-    if (!ready || navigating) return;
+    if (manual) {
+        paused = true;
+        updatePlayback();
+        clearTimeout(timer);
+    }
+    if (!ready) return;
+    if (navigating) {
+        if (manual) pendingMoves.push(direction);
+        return;
+    }
     navigating = true;
     clearTimeout(timer);
     let next = (current + direction + slides.length) % slides.length;
@@ -48,16 +76,32 @@ async function moveSlide(direction, manual = false) {
         schedule();
         return;
     }
+    if (next === current) {
+        navigating = false;
+        schedule();
+        return;
+    }
+    const duration = reducedMotion.matches ? 0 : manual ? 350 : 1200;
+    document.querySelector('.gallery').style.setProperty('--slide-duration', `${duration}ms`);
     slides.forEach(slide => slide.classList.remove('is-previous'));
+    // Reset the incoming frame below the outgoing image before fading it in.
+    // This also resets a previous frame when navigating in reverse.
+    void slides[next].offsetWidth;
     slides[current].classList.add('is-previous');
     slides[current].classList.remove('is-active');
     slides[current].setAttribute('aria-hidden', 'true');
     slides[next].classList.add('is-active');
     slides[next].setAttribute('aria-hidden', 'false');
     current = next;
-    navigating = false;
     counter.textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`;
-    schedule();
+    await new Promise(resolve => setTimeout(resolve, duration));
+    slides.forEach(slide => slide.classList.remove('is-previous'));
+    navigating = false;
+    if (pendingMoves.length) {
+        moveSlide(pendingMoves.shift(), true);
+    } else {
+        schedule();
+    }
 }
 
 document.querySelector('#previous-slide').addEventListener('click', () => moveSlide(-1, true));
